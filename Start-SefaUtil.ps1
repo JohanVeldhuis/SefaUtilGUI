@@ -2535,13 +2535,13 @@ function APPLY
 				$statusBar.text = 'status: Enable forward immediate'
 			    $TB_LOG.Appendtext("$(Get-Date -format "dd-MM-yyyy HH:mm:ss")`t")
 				$TB_LOG.Appendtext("Enabling forward immediate `r`n")
-				$output = SEFAUTIL /Server:$pool $($getUserInfo.SipAddress.ToLower().Replace('sip:','')) /enablefwdimmediate /setfwddestination:$($getDelegateInfo.SipAddress.ToLower().Replace('sip:',''))
+				$output = SEFAUTIL /Server:$pool $($getUserInfo.SipAddress.ToLower().Replace('sip:','')) /enablefwdimmediate /setfwddestination:$($getDelegateInfo.SipAddress.ToLower().Replace('sip:','')) /callanswerwaittime:$($TB_User_Ringtime.text)
         }
 	    elseif ($CB_FWD_Immediate.Checked -eq $true){
                 $statusBar.text = 'status: Enable forward immediate'
 			    $TB_LOG.Appendtext("$(Get-Date -format "dd-MM-yyyy HH:mm:ss")`t")
 				$TB_LOG.Appendtext("Enabling forward immediate `r`n")
-				$output = SEFAUTIL /Server:$pool $($getUserInfo.SipAddress.ToLower().Replace('sip:','')) /enablefwdimmediate /setfwddestination:$($TB_FWD_DEST.text)
+				$output = SEFAUTIL /Server:$pool $($getUserInfo.SipAddress.ToLower().Replace('sip:','')) /enablefwdimmediate /setfwddestination:$($TB_FWD_DEST.text) /callanswerwaittime:$($TB_User_Ringtime.text)
 			}	
         elseif ($CB_FWD_Immediate.Checked -eq $false){
                 $statusBar.text = 'status: Disable forward immediate'
@@ -2557,7 +2557,7 @@ function APPLY
 				foreach ($selectedDel in $selectedDelegate){
 					$TB_LOG.Appendtext("$(Get-Date -format "dd-MM-yyyy HH:mm:ss")`t")
 					$TB_LOG.Appendtext("Enabling simultaneous ring delegates `r`n")
-					$output = SEFAUTIL /Server:$pool $($getUserInfo.SipAddress.ToLower().Replace('sip:','')) /adddelegate:$((Get-CsUser -identity $($selectedDel)).SipAddress.ToLower().Replace('sip:','')) /simulringdelegates
+					$output = SEFAUTIL /Server:$pool $($getUserInfo.SipAddress.ToLower().Replace('sip:','')) /adddelegate:$((Get-CsUser -identity $($selectedDel)).SipAddress.ToLower().Replace('sip:','')) /simulringdelegates /delayringdelegates:$($TB_User_Ringtime.text)
 				}
 			}
 		    Elseif ($CB_SIM_RING_DEL.Checked -eq $false){
@@ -2596,7 +2596,7 @@ function APPLY
 				$TB_LOG.Appendtext("Enable simultaneous ring group `r`n")
 				$statusBar.text = 'status: Enable simultaneous ring group'
 				foreach ($selectedDel in $selectedDelegate){
-					$output = SEFAUTIL /Server:$pool $($getUserInfo.SipAddress.ToLower().Replace('sip:','')) /addteammember:$((Get-CsUser -identity $($selectedDel)).SipAddress.ToLower().Replace('sip:','')) /simulringteam
+					$output = SEFAUTIL /Server:$pool $($getUserInfo.SipAddress.ToLower().Replace('sip:','')) /addteammember:$((Get-CsUser -identity $($selectedDel)).SipAddress.ToLower().Replace('sip:','')) /simulringteam /delayringteam:$($TB_User_Ringtime.text)
 				}
 			}
 			else{
