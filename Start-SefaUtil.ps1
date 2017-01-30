@@ -513,6 +513,7 @@ $System_Drawing_Size.Height = 20
 $System_Drawing_Size.Width = 183
 $TB_FWD_DEST.Size = $System_Drawing_Size
 $TB_FWD_DEST.TabIndex = 23
+$TB_FWD_DEST.add_Leave({SET_FWD_NO_ANSWER_DEST})
 $tabMain.Controls.Add($TB_FWD_DEST)
 
 $LB_FWD_DEST.DataBindings.DefaultDataSourceUpdateMode = 0
@@ -2157,6 +2158,7 @@ function SET_FWD_NO_ANSWER_DEST
 	if($TB_FWD_DEST.BackColor -eq [System.Drawing.Color]::FromArgb(255,191,205,219)){
 		$TB_FWD_DEST.BackColor = ''
 	}
+        $BTN_APPLY.Enabled = $true
 }
 
 function SET_CHG_SIM_RING_DEST
@@ -2282,7 +2284,7 @@ function resetVariables
 	$script:SIM_RING_TEAM = $NULL
 	$script:SIM_RING = $NULL
 	$script:SET_SIM_RING_DEST_CHANGED = $NULL
-	$script:SET_FWD_NOANSWER_DEST_CHANGED = $NULL
+	$script:SET_FWD_NO_ANSWER_DEST_CHANGED = $NULL
 	$script:SET_DELEGATE = $NULL
 	$script:REMOVE_DELEGATE = $NULL
 	$script:GROUPID_CHANGED = $NULL
@@ -2517,7 +2519,7 @@ function APPLY
 			$TB_LOG.Appendtext("$(Get-Date -format "dd-MM-yyyy HH:mm:ss")`t")
 			$TB_LOG.Appendtext("Enabling forward no answer `r`n")
             $output = SEFAUTIL /Server:$pool $($getUserInfo.SipAddress.ToLower().Replace('sip:','')) /enablefwdnoanswer /setfwddestination:$($TB_FWD_DEST.text) /callanswerwaittime:$($TB_User_Ringtime.text)
-			$SET_FWD_NOANSWER_DEST_CHANGED = $NULL
+			$SET_FWD_NO_ANSWER_DEST_CHANGED = $NULL
 		 }
 		Elseif($CB_FWD_NOANSWER.Checked -eq $false){
 			    $TB_LOG.Appendtext("$(Get-Date -format "dd-MM-yyyy HH:mm:ss")`t")
@@ -2697,12 +2699,13 @@ function APPLY
 		}
 	}
 
-	if($SET_FWD_NOANSWER_DEST_CHANGED -eq 'changed'){
+	if($SET_FWD_NO_ANSWER_DEST_CHANGED -eq 'changed'){
 		if ($CB_FWD_NOANSWER.Checked -eq $true){
 			$statusBar.text = 'status: Changing forward no answer destination'
 			$TB_LOG.Appendtext("$(Get-Date -format "dd-MM-yyyy HH:mm:ss")`t")
 			$TB_LOG.Appendtext("Changing forward no answer destination`r`n")
-			$output = SEFAUTIL /Server:$pool $($getUserInfo.SipAddress.ToLower().Replace('sip:','')) /enablefwdnoanswer /setfwddestination:$TB_FWD_DEST
+			$temp = $($TB_FWD_DEST.text)
+			$output = SEFAUTIL /Server:$pool $($getUserInfo.SipAddress.ToLower().Replace('sip:','')) /enablefwdnoanswer /setfwddestination:$temp
 		}
 	}
 	
