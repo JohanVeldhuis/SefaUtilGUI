@@ -55,8 +55,10 @@ Website:    http://www.johanveldhuis.nl
 Twitter:    http://twitter.com/jveldh
 
 Change Log
+v2.2 DEV VERSION
+
 v2.0 02/09/2015 - Replaced Sefautil queries by SQL queries, introduced backup and restore solution, added new parameter digits, 
-                  added new button to suggest delelagates based on same manager. Added Skype for Business Server 2015 support.
+                  added new button to suggest delegates based on same manager. Added Skype for Business Server 2015 support.
                   Added button to switch pools and a lot of code optimization.
 V1.0, 08/08/2013 - Initial version
 #>
@@ -170,6 +172,8 @@ $CB_POOLS = New-Object System.Windows.Forms.ComboBox
 $LB_POOLS = New-Object System.Windows.Forms.Label
 $BTN_CHG_POOLS = New-Object System.Windows.Forms.Button
 $BTN_SEARCH_DEL = New-Object System.Windows.Forms.Button
+$GB_FWD_GROUP = New-Object System.Windows.Forms.Groupbox
+$GB_SIMRING_GROUP = New-Object System.Windows.Forms.Groupbox
 $TB_FWD_DEST = New-Object System.Windows.Forms.TextBox
 $LB_FWD_DEST = New-Object System.Windows.Forms.Label
 $LB_TIME_FORMAT = New-Object System.Windows.Forms.Label
@@ -224,7 +228,8 @@ $System_Drawing_Size.Width = 1000
 $form.ClientSize = $System_Drawing_Size
 $form.DataBindings.DefaultDataSourceUpdateMode = 0
 $form.Name = 'form'
-$form.Text = 'Sefautil Gui 2.0'
+$form.Text = 'Sefautil Gui 2.2-Dev'
+
 $form.add_Load({initialize})
 
 $tabControl1.DataBindings.DefaultDataSourceUpdateMode = 0
@@ -265,17 +270,50 @@ $tabMain.UseVisualStyleBackColor = $True
 
 $tabControl1.Controls.Add($tabMain)
 
+
+$GB_FWD_GROUP.DataBindings.DefaultDataSourceUpdateMode = 0
+$GB_FWD_GROUP.Enabled = $True
+#$GB_FWD_GROUP.FormattingEnabled = $True
+$System_Drawing_Point = New-Object System.Drawing.Point
+$System_Drawing_Point.X = 375
+$System_Drawing_Point.Y = 28
+$GB_FWD_GROUP.Location = $System_Drawing_Point
+$GB_FWD_GROUP.Name = "GB_FWD"
+$System_Drawing_Size = New-Object System.Drawing.Size
+$System_Drawing_Size.Height = 110
+$System_Drawing_Size.Width = 200
+$GB_FWD_GROUP.Size = $System_Drawing_Size
+#$GB_FWD_GROUP.TabIndex = 25
+
+$tabMain.Controls.Add($GB_FWD_GROUP)
+
+$GB_SIMRING_GROUP.DataBindings.DefaultDataSourceUpdateMode = 0
+$GB_SIMRING_GROUP.Enabled = $True
+#$GB_SIMRING_GROUP.FormattingEnabled = $True
+$System_Drawing_Point = New-Object System.Drawing.Point
+$System_Drawing_Point.X = 375
+$System_Drawing_Point.Y = 133
+$GB_SIMRING_GROUP.Location = $System_Drawing_Point
+$GB_SIMRING_GROUP.Name = "GB_SIMRING"
+$System_Drawing_Size = New-Object System.Drawing.Size
+$System_Drawing_Size.Height = 140
+$System_Drawing_Size.Width = 200
+$GB_SIMRING_GROUP.Size = $System_Drawing_Size
+#$GB_SIMRING_GROUP.TabIndex = 25
+
+$tabMain.Controls.Add($GB_SIMRING_GROUP)
+
 $CB_SIM_RING_DEST.DataBindings.DefaultDataSourceUpdateMode = 0
 $CB_SIM_RING_DEST.Enabled = $False
 $CB_SIM_RING_DEST.FormattingEnabled = $True
 $System_Drawing_Point = New-Object System.Drawing.Point
-$System_Drawing_Point.X = 730
+$System_Drawing_Point.X = 750
 $System_Drawing_Point.Y = 176
 $CB_SIM_RING_DEST.Location = $System_Drawing_Point
 $CB_SIM_RING_DEST.Name = "CB_FWD_DEST"
 $System_Drawing_Size = New-Object System.Drawing.Size
 $System_Drawing_Size.Height = 21
-$System_Drawing_Size.Width = 183
+$System_Drawing_Size.Width = 170
 $CB_SIM_RING_DEST.Size = $System_Drawing_Size
 $CB_SIM_RING_DEST.TabIndex = 25
 $CB_SIM_RING_DEST.add_Leave({SET_CHG_SIM_RING_DEST})
@@ -285,13 +323,13 @@ $CB_POOLS.DataBindings.DefaultDataSourceUpdateMode = 0
 $CB_POOLS.Enabled = $True
 $CB_POOLS.FormattingEnabled = $True
 $System_Drawing_Point = New-Object System.Drawing.Point
-$System_Drawing_Point.X = 730
+$System_Drawing_Point.X = 750
 $System_Drawing_Point.Y = 200
 $CB_POOLS.Location = $System_Drawing_Point
 $CB_POOLS.Name = "CB_POOLS"
 $System_Drawing_Size = New-Object System.Drawing.Size
 $System_Drawing_Size.Height = 23
-$System_Drawing_Size.Width = 183
+$System_Drawing_Size.Width = 170
 $CB_POOLS.Size = $System_Drawing_Size
 $CB_POOLS.TabIndex = 25
 #$CB_POOLS.add_Leave({SET_CHG_POOLS})
@@ -299,7 +337,7 @@ $tabMain.Controls.Add($CB_POOLS)
 
 $LB_POOLS.DataBindings.DefaultDataSourceUpdateMode = 0
 $System_Drawing_Point = New-Object System.Drawing.Point
-$System_Drawing_Point.X = 566
+$System_Drawing_Point.X = 580
 $System_Drawing_Point.Y = 200
 $LB_POOLS.Location = $System_Drawing_Point
 $LB_POOLS.Name = 'LB_SIM_RING'
@@ -504,22 +542,22 @@ $tabInfo.Controls.Add($LB_DIAGNOSTIC)
 $TB_FWD_DEST.DataBindings.DefaultDataSourceUpdateMode = 0
 $TB_FWD_DEST.Enabled = $False
 $System_Drawing_Point = New-Object System.Drawing.Point
-$System_Drawing_Point.X = 730
+$System_Drawing_Point.X = 750
 $System_Drawing_Point.Y = 54
 $TB_FWD_DEST.Location = $System_Drawing_Point
 $TB_FWD_DEST.Name = "TB_FWD_DEST"
 $System_Drawing_Size = New-Object System.Drawing.Size
 $System_Drawing_Size.Height = 20
-$System_Drawing_Size.Width = 183
+$System_Drawing_Size.Width = 170
 $TB_FWD_DEST.Size = $System_Drawing_Size
 $TB_FWD_DEST.TabIndex = 23
-$TB_FWD_DEST.add_Leave({SET_FWD_NO_ANSWER_DEST})
+
 $tabMain.Controls.Add($TB_FWD_DEST)
 
 $LB_FWD_DEST.DataBindings.DefaultDataSourceUpdateMode = 0
 
 $System_Drawing_Point = New-Object System.Drawing.Point
-$System_Drawing_Point.X = 566
+$System_Drawing_Point.X = 580
 $System_Drawing_Point.Y = 54
 $LB_FWD_DEST.Location = $System_Drawing_Point
 $LB_FWD_DEST.Name = "LB_FWD_DEST"
@@ -570,8 +608,8 @@ $tabMain.Controls.Add($BTN_REM_TEAM_M)
 $TB_GRP_PICKUP_NR.DataBindings.DefaultDataSourceUpdateMode = 0
 $TB_GRP_PICKUP_NR.Enabled = $False
 $System_Drawing_Point = New-Object System.Drawing.Point
-$System_Drawing_Point.X = 730
-$System_Drawing_Point.Y = 83
+$System_Drawing_Point.X = 750
+$System_Drawing_Point.Y = 118
 $TB_GRP_PICKUP_NR.Location = $System_Drawing_Point
 $TB_GRP_PICKUP_NR.Name = 'TB_GRP_PICKUP_NR'
 $System_Drawing_Size = New-Object System.Drawing.Size
@@ -638,8 +676,9 @@ $tabMain.Controls.Add($LB_Users)
 $LB_GRP_PICKUP.DataBindings.DefaultDataSourceUpdateMode = 0
 
 $System_Drawing_Point = New-Object System.Drawing.Point
-$System_Drawing_Point.X = 566
-$System_Drawing_Point.Y = 88
+$System_Drawing_Point.X = 580
+$System_Drawing_Point.Y = 118
+
 $LB_GRP_PICKUP.Location = $System_Drawing_Point
 $LB_GRP_PICKUP.Name = 'LB_GRP_PICKUP'
 $System_Drawing_Size = New-Object System.Drawing.Size
@@ -648,13 +687,15 @@ $System_Drawing_Size.Width = 183
 $LB_GRP_PICKUP.Size = $System_Drawing_Size
 $LB_GRP_PICKUP.TabIndex = 17
 $LB_GRP_PICKUP.Text = 'Group Pickup Number'
-$LB_GRP_PICKUP.Visible = $false
+#$LB_GRP_PICKUP.Visible = $false
+$LB_GRP_PICKUP.Enabled= $false
 
 $tabMain.Controls.Add($LB_GRP_PICKUP)
+
 $LB_SIM_RING.DataBindings.DefaultDataSourceUpdateMode = 0
 
 $System_Drawing_Point = New-Object System.Drawing.Point
-$System_Drawing_Point.X = 566
+$System_Drawing_Point.X = 580
 $System_Drawing_Point.Y = 176
 $LB_SIM_RING.Location = $System_Drawing_Point
 $LB_SIM_RING.Name = 'LB_SIM_RING'
@@ -670,8 +711,8 @@ $tabMain.Controls.Add($LB_SIM_RING)
 $CB_DISABLE_ALL.DataBindings.DefaultDataSourceUpdateMode = 0
 
 $System_Drawing_Point = New-Object System.Drawing.Point
-$System_Drawing_Point.X = 380
-$System_Drawing_Point.Y = 207
+$System_Drawing_Point.X = 12
+$System_Drawing_Point.Y = 105
 $CB_DISABLE_ALL.Location = $System_Drawing_Point
 $CB_DISABLE_ALL.Name = 'CB_DISABLE_ALL'
 $System_Drawing_Size = New-Object System.Drawing.Size
@@ -679,16 +720,17 @@ $System_Drawing_Size.Height = 24
 $System_Drawing_Size.Width = 104
 $CB_DISABLE_ALL.Size = $System_Drawing_Size
 #$CB_DISABLE_ALL.TabIndex = 14
-$CB_DISABLE_ALL.Text = 'Disable all'
+$CB_DISABLE_ALL.Text = 'Disable sim-ring'
 $CB_DISABLE_ALL.UseVisualStyleBackColor = $True
 
-$tabMain.Controls.Add($CB_DISABLE_ALL)
+$GB_SIMRING_GROUP.Controls.Add($CB_DISABLE_ALL)
 
 $CB_GRP_PICKUP.DataBindings.DefaultDataSourceUpdateMode = 0
 
 $System_Drawing_Point = New-Object System.Drawing.Point
-$System_Drawing_Point.X = 380
-$System_Drawing_Point.Y = 250
+$System_Drawing_Point.X = 580
+$System_Drawing_Point.Y = 88
+
 $CB_GRP_PICKUP.Location = $System_Drawing_Point
 $CB_GRP_PICKUP.Name = 'CB_GRP_PICKUP'
 $System_Drawing_Size = New-Object System.Drawing.Size
@@ -706,8 +748,8 @@ $tabMain.Controls.Add($CB_GRP_PICKUP)
 $CB_SIM_RING.DataBindings.DefaultDataSourceUpdateMode = 0
 
 $System_Drawing_Point = New-Object System.Drawing.Point
-$System_Drawing_Point.X = 380
-$System_Drawing_Point.Y = 176
+$System_Drawing_Point.X = 12
+$System_Drawing_Point.Y = 75
 $CB_SIM_RING.Location = $System_Drawing_Point
 $CB_SIM_RING.Name = 'CB_SIM_RING'
 $System_Drawing_Size = New-Object System.Drawing.Size
@@ -720,14 +762,14 @@ $CB_SIM_RING.UseVisualStyleBackColor = $True
 $CB_SIM_RING.Visible = $false
 $CB_SIM_RING.add_CheckedChanged({SET_CHG_SIM_RING})
 
-$tabMain.Controls.Add($CB_SIM_RING)
+$GB_SIMRING_GROUP.Controls.Add($CB_SIM_RING)
 
 
 $CB_SIM_RING_TEAM.DataBindings.DefaultDataSourceUpdateMode = 0
 
 $System_Drawing_Point = New-Object System.Drawing.Point
-$System_Drawing_Point.X = 380
-$System_Drawing_Point.Y = 145
+$System_Drawing_Point.X = 12
+$System_Drawing_Point.Y = 45
 $CB_SIM_RING_TEAM.Location = $System_Drawing_Point
 $CB_SIM_RING_TEAM.Name = 'CB_SIM_RING_TEAM'
 $System_Drawing_Size = New-Object System.Drawing.Size
@@ -739,7 +781,7 @@ $CB_SIM_RING_TEAM.Text = 'Simultaneous Ring Team'
 $CB_SIM_RING_TEAM.UseVisualStyleBackColor = $True
 $CB_SIM_RING_TEAM.Visible = $false
 $CB_SIM_RING_TEAM.add_CheckedChanged({SET_CHG_SIM_RING_TEAM})
-$tabMain.Controls.Add($CB_SIM_RING_TEAM)
+$GB_SIMRING_GROUP.Controls.Add($CB_SIM_RING_TEAM)
 
 
 $BTN_REM_DEL.DataBindings.DefaultDataSourceUpdateMode = 0
@@ -797,8 +839,8 @@ $tabMain.Controls.Add($LB_SourceUsers)
 $CB_SIM_RING_DEL.DataBindings.DefaultDataSourceUpdateMode = 0
 
 $System_Drawing_Point = New-Object System.Drawing.Point
-$System_Drawing_Point.X = 380
-$System_Drawing_Point.Y = 114
+$System_Drawing_Point.X = 12
+$System_Drawing_Point.Y = 15
 $CB_SIM_RING_DEL.Location = $System_Drawing_Point
 $CB_SIM_RING_DEL.Name = 'CB_SIM_RING_DEL'
 $System_Drawing_Size = New-Object System.Drawing.Size
@@ -810,7 +852,7 @@ $CB_SIM_RING_DEL.Text = 'Simultaneous Ring Delegates'
 $CB_SIM_RING_DEL.UseVisualStyleBackColor = $True
 $CB_SIM_RING_DEL.add_CheckedChanged({SET_CHG_SIM_RING_DEL})
 
-$tabMain.Controls.Add($CB_SIM_RING_DEL)
+$GB_SIMRING_GROUP.Controls.Add($CB_SIM_RING_DEL)
 
 $LB_DelegateUsers.Enabled = $False
 $LB_DelegateUsers.DataBindings.DefaultDataSourceUpdateMode = 0
@@ -834,8 +876,8 @@ $tabMain.Controls.Add($LB_DelegateUsers)
 $CB_FWD_TO_DEL.DataBindings.DefaultDataSourceUpdateMode = 0
 
 $System_Drawing_Point = New-Object System.Drawing.Point
-$System_Drawing_Point.X = 380
-$System_Drawing_Point.Y = 84
+$System_Drawing_Point.X = 12
+$System_Drawing_Point.Y = 75
 $CB_FWD_TO_DEL.Location = $System_Drawing_Point
 $CB_FWD_TO_DEL.Name = 'CB_FWD_TO_DEL'
 $System_Drawing_Size = New-Object System.Drawing.Size
@@ -847,7 +889,7 @@ $CB_FWD_TO_DEL.Text = 'Forward to delegates'
 $CB_FWD_TO_DEL.UseVisualStyleBackColor = $True
 $CB_FWD_TO_DEL.add_CheckedChanged({SET_CHG_FWD_TO_DEL})
 
-$tabMain.Controls.Add($CB_FWD_TO_DEL)
+$GB_FWD_GROUP.Controls.Add($CB_FWD_TO_DEL)
 
 $LB_User_Details.DataBindings.DefaultDataSourceUpdateMode = 0
 $LB_User_Details.FormattingEnabled = $True
@@ -923,8 +965,8 @@ $tabMain.Controls.Add($BTN_Load)
 $CB_FWD_Immediate.DataBindings.DefaultDataSourceUpdateMode = 0
 
 $System_Drawing_Point = New-Object System.Drawing.Point
-$System_Drawing_Point.X = 380
-$System_Drawing_Point.Y = 54
+$System_Drawing_Point.X = 12
+$System_Drawing_Point.Y = 45
 $CB_FWD_Immediate.Location = $System_Drawing_Point
 $CB_FWD_Immediate.Name = 'CB_FWD_Immediate'
 $System_Drawing_Size = New-Object System.Drawing.Size
@@ -936,12 +978,14 @@ $CB_FWD_Immediate.Text = 'Forward Immediate'
 $CB_FWD_Immediate.UseVisualStyleBackColor = $True
 $CB_FWD_Immediate.add_CheckedChanged({SET_CHG_FWD_IMMEDIATE})
 
-$tabMain.Controls.Add($CB_FWD_Immediate)
+$GB_FWD_GROUP.Controls.Add($CB_FWD_Immediate)
+
+
 
 $LB_User_ring_time.DataBindings.DefaultDataSourceUpdateMode = 0
 
 $System_Drawing_Point = New-Object System.Drawing.Point
-$System_Drawing_Point.X = 566
+$System_Drawing_Point.X = 580
 $System_Drawing_Point.Y = 33
 $LB_User_ring_time.Location = $System_Drawing_Point
 $LB_User_ring_time.Name = 'LB_User_ring_time'
@@ -958,8 +1002,8 @@ $tabMain.Controls.Add($LB_User_ring_time)
 $CB_FWD_NOANSWER.DataBindings.DefaultDataSourceUpdateMode = 0
 
 $System_Drawing_Point = New-Object System.Drawing.Point
-$System_Drawing_Point.X = 380
-$System_Drawing_Point.Y = 27
+$System_Drawing_Point.X = 12
+$System_Drawing_Point.Y = 15
 $CB_FWD_NOANSWER.Location = $System_Drawing_Point
 $CB_FWD_NOANSWER.Name = 'CB_FWD_NOANSWER'
 $System_Drawing_Size = New-Object System.Drawing.Size
@@ -971,7 +1015,7 @@ $CB_FWD_NOANSWER.Text = 'Forward No Answer'
 $CB_FWD_NOANSWER.UseVisualStyleBackColor = $True
 $CB_FWD_NOANSWER.add_CheckedChanged({SET_CHG_FWD_NO_ANSWER})
 
-$tabMain.Controls.Add($CB_FWD_NOANSWER)
+$GB_FWD_GROUP.Controls.Add($CB_FWD_NOANSWER)
 
 $TB_User_Ringtime.DataBindings.DefaultDataSourceUpdateMode = 0
 $TB_User_RingTime.Enabled = $False
@@ -1129,7 +1173,8 @@ function initialize
 
 function ConnectSQL
 {
-    #Find ResourceId for user'    param([string]$query)
+    #Find ResourceId for user'
+    param([string]$query)
 
     #Define connection string
 
@@ -1187,7 +1232,8 @@ $EXPORT|Out-File $file
 
 function SRC_USER
 {
-    #Find ResourceId for user'    param([string]$userid)
+    #Find ResourceId for user'
+    param([string]$userid)
 
     ConnectSQL -query "select ResourceId from Resource where UserAtHost = '$userid'"
 
@@ -1199,7 +1245,7 @@ function SRC_USER
 
 #endregion
 
-#region Functions to check is features are enabled
+#region Functions to check if features are enabled
 function CHK_CALL_FWD_NO_ANSWER
 {
     if($mode -eq "restore")
@@ -1317,7 +1363,7 @@ function CHK_FWD_IM
 {
     if($mode -eq "restore")
     {
-             
+
         if($Settings.Contains("<flags name=`"clientflags`" value=`"enablecf forward_immediate`">"))
 	    {
 		            $xmlSplitStart = $Settings -split "<list name=`"forwardto`">"
@@ -1325,7 +1371,7 @@ function CHK_FWD_IM
 		            $xmlSplitList = $splitStart -split "</list>"
 		            $splitList = $xmlSplitList[0]
 
-		
+
 		            if($splitList.Contains("target uri=`"sip:"))
 		            {
 			            $start = $splitList.IndexOf("<target uri=`"sip:")
@@ -1361,7 +1407,7 @@ function CHK_FWD_IM
 	        foreach ($Row in $data)
 	        { 
 	            [string]$Setting = $Row[1]
-	
+
 	            if($Setting.Contains("<list name=`"forwardto`">"))
 	            {
 		            $xmlSplitStart = $Setting -split "<list name=`"forwardto`">"
@@ -1388,13 +1434,60 @@ function CHK_FWD_IM
                             $TB_FWD_DEST.text = $FWD_NR
                             }
                         else{     
-		                    $LB_DelegateUsers.SelectedItem = $(Get-CsUser -DomainController $dc|? {$_.SipAddress -eq "sip:" + $FWD_NR}).DisplayName
+							$TB_FWD_DEST.text = "sip:" + $FWD_NR
                         }
 		            }
 	            }
 	        }
     }	
 }
+
+function CHK_FWD_VM
+{
+    if($mode -eq "restore")
+    {
+		# JOHAN: This restore code is untested.
+        if($settings.contains("<flags name=`"clientflags`" value=`"forward_immediate`">"))
+	    {
+		            $xmlsplitstart = $settings -split "<list name=`"forwardto`">"
+		            $splitstart = $xmlsplitstart[1]
+		            $xmlsplitlist = $splitstart -split "</list>"
+		            $splitlist = $xmlsplitlist[0]
+		            if ($splitList -eq "")
+		            {
+						$CB_FWD_Immediate.Checked = $true
+						$TB_FWD_DEST.text = "Voicemail"
+					}
+	  }
+    }
+    else
+    {
+        #Verify if user has set the option to forward immediately to voicemail
+        ConnectSQL -query "select distinct UserAtHost,convert(varchar(4000),convert(varbinary(4000),Data)) `
+	                       from PublishedStaticInstance,Resource `
+	                       where PublisherId = '$ResourceId' and ResourceId = PublisherId and CategoryId = '8'`
+	                       and convert(varchar(4000),convert(varbinary(4000),Data)) `
+	                       like '%<flags name=`"clientflags`" value=`"forward_immediate`">%'"
+
+	        foreach ($Row in $data)
+	        { 
+	            [string]$Setting = $Row[1]
+	            if($Setting.Contains("<list name=`"forwardto`">"))
+	            {
+		            $xmlSplitStart = $Setting -split "<list name=`"forwardto`">"
+		            $splitStart = $xmlSplitStart[1]
+		            $xmlSplitList = $splitStart -split "</list>"
+		            $splitList = $xmlSplitList[0]
+		            if ($splitList -eq "")
+		            {
+						$CB_FWD_Immediate.Checked = $true
+						$TB_FWD_DEST.text = "Voicemail"
+					}
+	            }
+	        }
+    }	
+}
+
 
 function CHK_SIM_RING_DEL
 {
@@ -1726,6 +1819,8 @@ function CHK_FWD_DEL
   
 	    foreach ($Row in $data)
 	    { 
+		
+		write-warning ("DELEGATE     " + $row[1])
 	    [string]$Setting = $Row[1]
 	    if($Setting.Contains("<list name=`"delegates`">"))
 	    {
@@ -2029,6 +2124,7 @@ function SET_CHG_FWD_NO_ANSWER
 			$TB_FWD_DEST.Enabled = $false
 			$TB_User_RingTime.Enabled = $false
             $TB_User_RingTime.Text = ''
+			$CB_DISABLE_ALL.Checked = $true #Logic here: for this to be false, the 'immediate' options must be active, therefor no SimRings are permissable
             $BTN_APPLY.Enabled = $true
 		}
 }
@@ -2041,6 +2137,7 @@ function SET_CHG_FWD_IMMEDIATE
             $LB_DelegateUsers.Enabled = $true
             $TB_FWD_DEST.Enabled =$true
             $BTN_APPLY.Enabled = $true
+			$CB_DISABLE_ALL.Checked = $true
 		}
 		elseif ($CB_FWD_Immediate.Checked -eq $false){
 			$LB_DelegateUsers.Enabled = $false
@@ -2062,6 +2159,7 @@ function SET_CHG_SIM_RING_DEL
             $BTN_APPLY.Enabled = $true
             $BTN_REM_DEL.Enabled = $true
             $BTN_SEARCH_DEL.Enabled = $true
+			$CB_FWD_NOANSWER.Checked = $true
 		}
 		elseif ($CB_SIM_RING_DEL.Checked -eq $false){
 				$LB_DelegateUsers.Enabled = $false
@@ -2085,6 +2183,7 @@ function SET_CHG_FWD_TO_DEL
                     $BTN_APPLY.Enabled = $true
                     $BTN_REM_DEL.Enabled = $true
                     $BTN_SEARCH_DEL.Enabled = $true
+					$CB_DISABLE_ALL.Checked = $true
 			}
 			elseif ($CB_FWD_TO_DEL.Checked -eq $false){
 					$LB_DelegateUsers.Enabled = $false
@@ -2106,10 +2205,12 @@ function SET_CHG_GRP_PICKUP
 	$script:GRP_PICKUP = 'changed'
 			if ($CB_GRP_PICKUP.Checked -eq $true){
 				$CB_GRP_PICKUP.Enabled = $true
+				$LB_GRP_PICKUP.Enabled = $true
                 $TB_GRP_PICKUP_NR.Enabled = $true
                 $BTN_APPLY.Enabled = $true
 				}
 			elseif ($CB_GRP_PICKUP.Checked -eq $false){
+				$LB_GRP_PICKUP.Enabled = $false
 				$TB_GRP_PICKUP_NR.Enabled = $false
                 $BTN_APPLY.Enabled = $true
 				}
@@ -2126,6 +2227,7 @@ function SET_CHG_SIM_RING_TEAM
 				$TB_User_RingTime.Enabled = $true
                 $BTN_APPLY.Enabled = $true
                 $BTN_REM_TEAM_M.Enabled = $true
+				$CB_FWD_NOANSWER.Checked = $true
 		}
 		elseif ($CB_SIM_RING_TEAM.Checked -eq $false){
 				$LB_DelegateUsers.Enabled = $false
@@ -2144,6 +2246,7 @@ function SET_CHG_SIM_RING
             $LB_DelegateUsers.Enabled = $true
 			$CB_SIM_RING_DEST.Enabled = $true
             $BTN_APPLY.Enabled = $true
+			$CB_FWD_NOANSWER.Checked = $true
 		}
 		elseif ($CB_SIM_RING.Checked -eq $false){
 			$LB_DelegateUsers.Enabled = $false
@@ -2158,7 +2261,7 @@ function SET_FWD_NO_ANSWER_DEST
 	if($TB_FWD_DEST.BackColor -eq [System.Drawing.Color]::FromArgb(255,191,205,219)){
 		$TB_FWD_DEST.BackColor = ''
 	}
-        $BTN_APPLY.Enabled = $true
+
 }
 
 function SET_CHG_SIM_RING_DEST
@@ -2356,11 +2459,12 @@ function GetUserInfo
 	$statusBar.text = 'status: Retrieving user info'
 	$LB_User_Details.Items.Clear()
 	$CB_FWD_Immediate.Checked = $false
-	$CB_FWD_NOANSWER.Checked = $false
+	$CB_FWD_NOANSWER.Checked = $true
 	$CB_SIM_RING_DEL.Checked = $false
 	$CB_FWD_TO_DEL.Checked = $false
 	$CB_SIM_RING_TEAM.Checked = $false
 	$CB_SIM_RING.Checked = $false
+	$CB_DISABLE_ALL.Checked = $true
 	$CB_GRP_PICKUP.Checked = $false
 	$LB_DelegateUsers.ClearSelected()
 	$TB_FWD_DEST.Text = $NULL
@@ -2398,6 +2502,7 @@ function GetUserInfo
 	  }  
 	CHK_CALL_FWD_NO_ANSWER
 	CHK_FWD_IM
+	CHK_FWD_VM
 	CHK_SIM_RING_DEL
 	CHK_SIM_RING_TO
 	CHK_FWD_DEL
@@ -2537,13 +2642,13 @@ function APPLY
 				$statusBar.text = 'status: Enable forward immediate'
 			    $TB_LOG.Appendtext("$(Get-Date -format "dd-MM-yyyy HH:mm:ss")`t")
 				$TB_LOG.Appendtext("Enabling forward immediate `r`n")
-				$output = SEFAUTIL /Server:$pool $($getUserInfo.SipAddress.ToLower().Replace('sip:','')) /enablefwdimmediate /setfwddestination:$($getDelegateInfo.SipAddress.ToLower().Replace('sip:','')) /callanswerwaittime:$($TB_User_Ringtime.text)
+				$output = SEFAUTIL /Server:$pool $($getUserInfo.SipAddress.ToLower().Replace('sip:','')) /enablefwdimmediate /setfwddestination:$($getDelegateInfo.SipAddress.ToLower().Replace('sip:',''))
         }
 	    elseif ($CB_FWD_Immediate.Checked -eq $true){
                 $statusBar.text = 'status: Enable forward immediate'
 			    $TB_LOG.Appendtext("$(Get-Date -format "dd-MM-yyyy HH:mm:ss")`t")
 				$TB_LOG.Appendtext("Enabling forward immediate `r`n")
-				$output = SEFAUTIL /Server:$pool $($getUserInfo.SipAddress.ToLower().Replace('sip:','')) /enablefwdimmediate /setfwddestination:$($TB_FWD_DEST.text) /callanswerwaittime:$($TB_User_Ringtime.text)
+				$output = SEFAUTIL /Server:$pool $($getUserInfo.SipAddress.ToLower().Replace('sip:','')) /enablefwdimmediate /setfwddestination:$($TB_FWD_DEST.text)
 			}	
         elseif ($CB_FWD_Immediate.Checked -eq $false){
                 $statusBar.text = 'status: Disable forward immediate'
@@ -2559,7 +2664,7 @@ function APPLY
 				foreach ($selectedDel in $selectedDelegate){
 					$TB_LOG.Appendtext("$(Get-Date -format "dd-MM-yyyy HH:mm:ss")`t")
 					$TB_LOG.Appendtext("Enabling simultaneous ring delegates `r`n")
-					$output = SEFAUTIL /Server:$pool $($getUserInfo.SipAddress.ToLower().Replace('sip:','')) /adddelegate:$((Get-CsUser -identity $($selectedDel)).SipAddress.ToLower().Replace('sip:','')) /simulringdelegates /delayringdelegates:$($TB_User_Ringtime.text)
+					$output = SEFAUTIL /Server:$pool $($getUserInfo.SipAddress.ToLower().Replace('sip:','')) /adddelegate:$((Get-CsUser -identity $($selectedDel)).SipAddress.ToLower().Replace('sip:','')) /simulringdelegates
 				}
 			}
 		    Elseif ($CB_SIM_RING_DEL.Checked -eq $false){
@@ -2598,7 +2703,7 @@ function APPLY
 				$TB_LOG.Appendtext("Enable simultaneous ring group `r`n")
 				$statusBar.text = 'status: Enable simultaneous ring group'
 				foreach ($selectedDel in $selectedDelegate){
-					$output = SEFAUTIL /Server:$pool $($getUserInfo.SipAddress.ToLower().Replace('sip:','')) /addteammember:$((Get-CsUser -identity $($selectedDel)).SipAddress.ToLower().Replace('sip:','')) /simulringteam /delayringteam:$($TB_User_Ringtime.text)
+					$output = SEFAUTIL /Server:$pool $($getUserInfo.SipAddress.ToLower().Replace('sip:','')) /addteammember:$((Get-CsUser -identity $($selectedDel)).SipAddress.ToLower().Replace('sip:','')) /simulringteam
 				}
 			}
 			else{
@@ -2628,7 +2733,16 @@ function APPLY
 				}
 				elseif($CB_SIM_RING_DEST.text -ne ""){
 					if ($CB_SIM_RING.Checked -eq $true){
-                        if ($CB_SIM_RING_DEST.SelectedItem -eq "Home"){                            $output = SEFAUTIL /Server:$pool $($getUserInfo.SipAddress.ToLower().Replace('sip:','')) /setsimulringdestination:$((Get-CsAdUser -identity $getUserInfo.Identity).homePhone) /enablesimulring                        }                        elseif($CB_SIM_RING_DEST.SelectedItem -eq "IP"){                            $output = SEFAUTIL /Server:$pool $($getUserInfo.SipAddress.ToLower().Replace('sip:','')) /setsimulringdestination:$((Get-CsAdUser -identity $getUserInfo.Identity).IPPhone) /enablesimulring                        }                        elseif($CB_SIM_RING_DEST.SelectedItem -eq "Mobile"){                            $output = SEFAUTIL /Server:$pool $($getUserInfo.SipAddress.ToLower().Replace('sip:','')) /setsimulringdestination:$((Get-CsAdUser -identity $getUserInfo.Identity).MobilePhone) /enablesimulring                        }
+                        if ($CB_SIM_RING_DEST.SelectedItem -eq "Home"){
+                            $output = SEFAUTIL /Server:$pool $($getUserInfo.SipAddress.ToLower().Replace('sip:','')) /setsimulringdestination:$((Get-CsAdUser -identity $getUserInfo.Identity).homePhone) /enablesimulring
+
+                        }
+                        elseif($CB_SIM_RING_DEST.SelectedItem -eq "IP"){
+                            $output = SEFAUTIL /Server:$pool $($getUserInfo.SipAddress.ToLower().Replace('sip:','')) /setsimulringdestination:$((Get-CsAdUser -identity $getUserInfo.Identity).IPPhone) /enablesimulring
+                        }
+                        elseif($CB_SIM_RING_DEST.SelectedItem -eq "Mobile"){
+                            $output = SEFAUTIL /Server:$pool $($getUserInfo.SipAddress.ToLower().Replace('sip:','')) /setsimulringdestination:$((Get-CsAdUser -identity $getUserInfo.Identity).MobilePhone) /enablesimulring
+                        }
                         else
                         {                        
                             $temp = $CB_SIM_RING_DEST.text
@@ -2704,8 +2818,8 @@ function APPLY
 			$statusBar.text = 'status: Changing forward no answer destination'
 			$TB_LOG.Appendtext("$(Get-Date -format "dd-MM-yyyy HH:mm:ss")`t")
 			$TB_LOG.Appendtext("Changing forward no answer destination`r`n")
-			$temp = $($TB_FWD_DEST.text)
-			$output = SEFAUTIL /Server:$pool $($getUserInfo.SipAddress.ToLower().Replace('sip:','')) /enablefwdnoanswer /setfwddestination:$temp
+
+			$output = SEFAUTIL /Server:$pool $($getUserInfo.SipAddress.ToLower().Replace('sip:','')) /enablefwdnoanswer /setfwddestination:$TB_FWD_DEST
 		}
 	}
 	
@@ -2787,8 +2901,8 @@ function BACKUP_ALL
 function RESTORE_ALL
 {
 	$TB_LOG.Appendtext("$(Get-Date -format "dd-MM-yyyy HH:mm:ss")`t")
-	$TB_LOG.Appendtext("Restore all proces started `r`n")
-	$statusBar.text = 'status: restore all proces started'
+	$TB_LOG.Appendtext("Restore all process started `r`n")
+	$statusBar.text = 'status: restore all process started'
 	$script:restore = $true
     $users= Get-CsUser -DomainController $dc -resultsize unlimited|sort DisplayName
 	foreach ($user in $users)
@@ -2807,6 +2921,7 @@ function RESTORE_ALL
 
         CHK_CALL_FWD_NO_ANSWER
 		CHK_FWD_IM
+		CHK_FWD_VM
 		CHK_SIM_RING_DEL
 		CHK_SIM_RING_TO
 		CHK_FWD_DEL
@@ -2816,5 +2931,6 @@ function RESTORE_ALL
 				
   	}
 }
+
 #Call the Function
 GenerateForm
